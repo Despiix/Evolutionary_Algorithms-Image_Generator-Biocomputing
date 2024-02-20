@@ -2,8 +2,8 @@ from PIL import Image, ImageDraw, ImageChops
 from evol import Population
 import random
 
-SIDES = 3
-POLYGON_COUNT = 100
+SIDES = 5  # Amount of corners in each Polygon
+POLYGON_COUNT = 100  # Amount of Polygons generated
 # Constants for image
 MAX = 255 * 200 * 200
 TARGET = Image.open("Images/3a.png")
@@ -14,10 +14,10 @@ TARGET.load()  # read image and close the file
 def make_polygon(n):
     R, G, B = [random.randrange(256) for i in range(3)]
     A = random.randrange(30, 60)
-    x1, y1, x2, y2, x3, y3 = [random.randrange(10, 190) for i in range(6)]
+    x1, y1, x2, y2, x3, y3, x4, y4, x5, y5 = [random.randrange(10, 190) for i in range(10)]
 
     # 0 <= R|G|B < 256, 30 <= A <= 60, 10 <= x|y < 190
-    return [(R, G, B, A), (x1, y1), (x2, y2), (x3, y3)]
+    return [(R, G, B, A), (x1, y1), (x2, y2), (x3, y3), (x4, y4), (x5, y5)]
 
 
 def initialise():
