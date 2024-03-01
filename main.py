@@ -1,10 +1,9 @@
-import evol
 from PIL import Image, ImageDraw, ImageChops
 from evol import Population, Evolution
 import random
 
-SIDES = 5  # Amount of corners in each Polygon
-POLYGON_COUNT = 100  # Amount of Polygons generated
+SIDES = 3
+POLYGON_COUNT = 100
 # Constants for image
 MAX = 255 * 200 * 200
 TARGET = Image.open("Images/3a.png")
@@ -40,17 +39,26 @@ def mutate(solution, rate):
         # mutate points
         i = random.randrange(len(solution))
         polygon = list(solution[i])
-        coords = [x for point in polygon[1:] for x in point]
-        coords = [x if random.random() > rate else
+        coords = [x for point in polygon[1:] for x in
+                  point]  # Make a flat list of all the x and y coordinates the points
+        coords = [x if random.random() > rate else  # For each coordinate, sometimes randomly change it a little bit
                   x + random.normalvariate(0, 10) for x in coords]
-        coords = [max(0, min(int(x), 200)) for x in coords]
-        polygon[1:] = list(zip(coords[::2], coords[1::2]))
+        coords = [max(0, min(int(x), 200)) for x in coords]  # Make sure the polygon stays within the boundaries
+        polygon[1:] = list(zip(coords[::2], coords[1::2]))  # Put these adjusted coordinates back into pairs
         solution[i] = polygon
     else:
         # reorder polygons
         random.shuffle(solution)
 
     return solution
+
+
+def select(population):
+    return [random.choice(population) for i in range(2)]
+
+
+def combine(*parents):
+    return [a if random.random() < 0.5 else b for a, b in zip(*parents)]
 
 
 def evaluate(solution):
@@ -61,61 +69,16 @@ def evaluate(solution):
     return (MAX - count) / MAX
 
 
-def func_to_optimise(xy):
-    """
-    This is the function we want to optimise (maximize)
-    """
-    x, y = xy
-    return -(1 - x) ** 2 - (2 - y ** 2) ** 2
+def evolve(population, args):
+    population.survive(fraction=0.5)
+    population.breed(parent_picker=select, combiner=combine)
+    population.mutate(mutate_function=mutate, rate=0.1)
+    return population
 
 
 population = Population.generate(initialise, evaluate, size=10, maximize=True)
+for i in range(6000):
+    evolve(population, evaluate)
+    print(evaluate(solution=population[0].chromosome))
 
-
-def pick_random_parents(population):
-    """
-    This is how we are going to select parents from the population
-    """
-    mom = random.choice(population)
-    dad = random.choice(population)
-    return mom, dad
-
-
-def make_child(mom, dad):
-    # Assuming you want to mix polygons from both parents to create a child
-    # For simplicity, let's just concatenate half from each parent
-    half = len(mom) // 2
-    child = mom[:half] + dad[half:]
-    return child
-
-
-for i in range(100):
-    population = (population
-                  .survive(fraction=1)
-                  .breed(parent_picker=pick_random_parents, combiner=make_child)
-                  .mutate(mutate_function=mutate, rate=0.3))
-
-    evo1 = (Evolution()
-            .survive(fraction=0.5)
-            .breed(parent_picker=pick_random_parents, combiner=make_child)
-            .mutate(mutate_function=mutate, rate=1))
-
-    evo2 = (Evolution()
-            .survive(n=1)
-            .breed(parent_picker=pick_random_parents, combiner=make_child)
-            .mutate(mutate_function=mutate, rate=0.2))
-
-    evo3 = (Evolution()
-            .repeat(evo1, n=50)
-            .repeat(evo2, n=10)
-            .evaluate())
-
-    population = population.evolve(evo3, n=5)
-    print(f"the best score found: {max([i.fitness for i in population])}")
-
-
-def run():
-    draw(population[0].chromosome).save("solution.png")
-
-
-run()
+draw(population[0].chromosome).save("solution.png")
