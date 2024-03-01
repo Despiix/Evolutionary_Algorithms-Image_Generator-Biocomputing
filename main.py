@@ -35,7 +35,7 @@ def draw(solution):
 def mutate(solution, rate):
     solution = list(solution)
 
-    if random.random() < 0.3:  # Should be a value between 0 and 1 (percentage)
+    if random.random() < 0.5:  # Should be a value between 0 and 1 (percentage)
         # mutate points
         i = random.randrange(len(solution))
         polygon = list(solution[i])
@@ -72,13 +72,13 @@ def evaluate(solution):
 def evolve(population, args):
     population.survive(fraction=0.5)
     population.breed(parent_picker=select, combiner=combine)
-    population.mutate(mutate_function=mutate, rate=0.1)
+    population.mutate(mutate_function=mutate, rate=0.3)
     return population
 
 
 population = Population.generate(initialise, evaluate, size=10, maximize=True)
 for i in range(6000):
     evolve(population, evaluate)
-    print(evaluate(solution=population[0].chromosome))
+    print(i, evaluate(solution=population[0].chromosome))
 
 draw(population[0].chromosome).save("solution.png")
