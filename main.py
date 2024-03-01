@@ -115,7 +115,7 @@ def evolve(population, *args):
     Returns:
         the population after all the changes
     """
-    # Luck = If True, individuals randomly survive based on fitness; defaults to False.
+    # Luck = If True, individuals randomly survive based on fitness; defaults to False
     population.survive(fraction=0.5)
     population.breed(parent_picker=select, combiner=combine)
     population.mutate(mutate_function=mutate, rate=0.5)  # Mutates the polygons to and sets mutation rate
