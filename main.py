@@ -70,9 +70,9 @@ def evaluate(solution):
 
 
 def evolve(population, args):
-    population.survive(fraction=0.5)
+    population.survive(fraction=0.2)
     population.breed(parent_picker=select, combiner=combine)
-    population.mutate(mutate_function=mutate, rate=0.3)
+    population.mutate(mutate_function=mutate, rate=0.9)
     return population
 
 
