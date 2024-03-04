@@ -28,6 +28,7 @@ import multiprocessing
 import PIL
 import evol
 
+from evol import Population
 from PIL import Image, ImageChops, ImageDraw
 from pathlib import Path
 from docopt import docopt
@@ -164,16 +165,16 @@ def evolve(population, *args):
         the population after all the changes
     """
     # Luck = If True, individuals randomly survive based on fitness; defaults to False (Removed)
-    population.survive(fraction=0.5)
+    population.survive(fraction=0.1)
     population.breed(parent_picker=select, combiner=combine)
-    population.mutate(mutate_function=mutate, rate=0.8)  # Mutates the polygons to and sets mutation rate
+    population.mutate(mutate_function=mutate, rate=0.7)  # Mutates the polygons to and sets mutation rate
     return population
 
-# My initial code for the evolution algorithm - does not use Ipython
 '''
+# My initial code for the evolution algorithm - does not use Ipython
 if __name__ == "__main__":
     population = Population.generate(initialise, evaluate, size=10, maximize=True)
-    for i in range(6000):
+    for i in range(5000):
         evolve(population)  # returns the evolved population.
         print(i, evaluate(solution=population[0].chromosome))
 
@@ -241,14 +242,33 @@ if __name__ == "__main__":
     # create the first population
     population = Population(initialise, int(args["--pop-size"]), parallel_map)
 
-    # run the evolution
+    # Define threshold and limit for stability
+    stability_threshold = 0.00001  # Adjust as needed for what you consider a "stable" change
+    stability_limit = 100  # Number of generations with minimal change before stopping
+
+    # Initialize variables to track stability
+    previous_best_score = None
+    stable_generations_count = 0
+
     for i in range(1, int(args["--generations"])):
         evolve(population, args).callback(logger.log, generation=i)
+        current_best_score = population.current_best.fitness
 
-    # log the last iteration (ignoring the step)
-    logger.step = 1
-    evolve(population, args).callback(logger.log, generation=i + 1)
+        # Check if the score has changed significantly
+        if previous_best_score is not None:
+            score_change = abs(current_best_score - previous_best_score)
+            if score_change < stability_threshold:
+                stable_generations_count += 1
+            else:
+                stable_generations_count = 0  # Reset count if there's significant change
 
-    # save the best solution as image
-    name = "best_{}_p{--pop-size}_g{--generations}".format(path.stem, **args)
-    draw(population.current_best.chromosome).save("solution.png")
+            # Check if stability limit is reached
+            if stable_generations_count >= stability_limit:
+                print(f"Evolution stopped due to stability at generation {i}.")
+                break  # Stop the loop
+        previous_best_score = current_best_score
+
+    # Save the best solution as image outside the loop
+    name = f"best_{path.stem}_p{args['--pop-size']}_g{args['--generations']}"
+    draw(population.current_best.chromosome).save(f"{name}.png")
+    
