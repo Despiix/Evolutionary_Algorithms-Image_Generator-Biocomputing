@@ -165,7 +165,7 @@ def evolve(population, generation, max_generations, *args):
     Returns:
         Population: The evolved population
     """
-    start_rate = 0.7  # The initial mutation rate
+    start_rate = 0.9  # The initial mutation rate
     end_rate = 0.01  # The final mutation rate
     # Calculate the mutation rate for the current generation
     rate = start_rate * (1 - (generation / max_generations)) + end_rate * (generation / max_generations)
