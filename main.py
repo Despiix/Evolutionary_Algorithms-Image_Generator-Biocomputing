@@ -155,19 +155,24 @@ def evaluate(solution):
     return (MAX - count) / MAX
 
 
-def evolve(population, *args):
+def evolve(population, generation, max_generations, *args):
     """
     1. Adjusts the survival rate of the population
     2. Creates children by choosing parents and combining them
-    3. Mutates the polygons and sets the rate of mutation
+    3. Mutates the polygons and sets the rate of mutation, which decreases as
+    the number of generations increases.
 
     Returns:
-        the population after all the changes
+        Population: The evolved population
     """
-    # Luck = If True, individuals randomly survive based on fitness; defaults to False (Removed)
+    start_rate = 0.7  # The initial mutation rate
+    end_rate = 0.01  # The final mutation rate
+    # Calculate the mutation rate for the current generation
+    rate = start_rate * (1 - (generation / max_generations)) + end_rate * (generation / max_generations)
+
     population.survive(fraction=0.1)
     population.breed(parent_picker=select, combiner=combine)
-    population.mutate(mutate_function=mutate, rate=0.7)  # Mutates the polygons to and sets mutation rate
+    population.mutate(mutate_function=mutate, rate=rate)  # Use the dynamic mutation rate
     return population
 
 '''
@@ -251,7 +256,7 @@ if __name__ == "__main__":
     stable_generations_count = 0
 
     for i in range(1, int(args["--generations"])):
-        evolve(population, args).callback(logger.log, generation=i)
+        evolve(population, i, int(args["--generations"]), args).callback(logger.log, generation=i)
         current_best_score = population.current_best.fitness
 
         # Check if the score has changed significantly
