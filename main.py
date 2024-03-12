@@ -1,13 +1,14 @@
 import random
+import numpy as np
 
 from evol import Population
 from PIL import Image, ImageDraw
 
-
-SIDES = 3
+SIDES = 4
 POLYGON_COUNT = 100
 # Constants for image
 MAX = 255 * 200 * 200
+
 
 # TARGET = Image.open("Images/3a.png")
 # TARGET.load()  # read image and close the file
@@ -21,10 +22,11 @@ def make_polygon(n):
     """
     R, G, B = [random.randrange(256) for i in range(3)]  # Assigns random int values to Red, Green and Blue
     A = random.randrange(30, 60)  # Sets random opaqueness
-    x1, y1, x2, y2, x3, y3 = [random.randrange(10, 190) for i in range(6)]  # Sets random coordinates to polygons
+    x1, y1, x2, y2, x3, y3, x4, y4 = [random.randrange(10, 190) for i in
+                                      range(8)]  # Sets random coordinates to polygons
 
     # 0 <= R|G|B < 256, 30 <= A <= 60, 10 <= x|y < 190
-    return [(R, G, B, A), (x1, y1), (x2, y2), (x3, y3)]
+    return [(R, G, B, A), (x1, y1), (x2, y2), (x3, y3), (x4, y4)]
 
 
 def initialise():
@@ -107,6 +109,10 @@ def combine(*parents):
     return [a if random.random() < 0.5 else b for a, b in zip(*parents)]
 
 
+def sine_func(x, gens_per_cycle=200, decay=0.0001, min_=0.1):
+    return np.maximum(np.sin(x * (2 * np.pi) / gens_per_cycle) ** 2 * np.exp(-x * decay), min_)
+
+
 def evolve(population, generation, max_generations, *args):
     """
     1. Adjusts the survival rate of the population
@@ -117,14 +123,14 @@ def evolve(population, generation, max_generations, *args):
     Returns:
         Population: The evolved population
     """
-    start_rate = 0.7  # The initial mutation rate
+    start_rate = 0.9  # The initial mutation rate
     end_rate = 0.1  # The final mutation rate
     # Calculate the mutation rate for the current generation
     rate = start_rate * (1 - (generation / max_generations)) + end_rate * (generation / max_generations)
 
-    population.survive(fraction=0.1)
+    population.survive(fraction=0.3)
     population.breed(parent_picker=select, combiner=combine)
-    population.mutate(mutate_function=mutate, rate=rate)  # Use the dynamic mutation rate
+    population.mutate(mutate_function=mutate, rate=sine_func(generation))  # Use the dynamic mutation rate
     return population
 
 
