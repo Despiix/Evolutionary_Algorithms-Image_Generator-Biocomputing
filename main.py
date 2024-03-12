@@ -113,6 +113,7 @@ def sine_func(x, gens_per_cycle=200, decay=0.0001, min_=0.1):
     return np.maximum(np.sin(x * (2 * np.pi) / gens_per_cycle) ** 2 * np.exp(-x * decay), min_)
 
 
+# generation, max_generations are there for the use of dynamic mutation rates
 def evolve(population, generation, max_generations, *args):
     """
     1. Adjusts the survival rate of the population
@@ -123,14 +124,17 @@ def evolve(population, generation, max_generations, *args):
     Returns:
         Population: The evolved population
     """
+    # Start, end rates and rate give the option to change to simulated annealing approach if needed
+    '''
     start_rate = 0.9  # The initial mutation rate
-    end_rate = 0.1  # The final mutation rate
+    end_rate = 0.3  # The final mutation rate
     # Calculate the mutation rate for the current generation
     rate = start_rate * (1 - (generation / max_generations)) + end_rate * (generation / max_generations)
-
-    population.survive(fraction=0.3)
+    '''
+    population.survive(fraction=0.1)
     population.breed(parent_picker=select, combiner=combine)
-    population.mutate(mutate_function=mutate, rate=sine_func(generation))  # Use the dynamic mutation rate
+    # uncomment code above and type rate=rate to use simulated annealing
+    population.mutate(mutate_function=mutate, rate=sine_func(generation))
     return population
 
 
