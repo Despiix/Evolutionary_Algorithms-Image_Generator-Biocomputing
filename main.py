@@ -4,7 +4,7 @@ import numpy as np
 from evol import Population
 from PIL import Image, ImageDraw
 
-SIDES = 4
+SIDES = 7
 POLYGON_COUNT = 100
 # Constants for image
 MAX = 255 * 200 * 200
@@ -22,11 +22,10 @@ def make_polygon(n):
     """
     R, G, B = [random.randrange(256) for i in range(3)]  # Assigns random int values to Red, Green and Blue
     A = random.randrange(30, 60)  # Sets random opaqueness
-    x1, y1, x2, y2, x3, y3, x4, y4 = [random.randrange(10, 190) for i in
-                                      range(8)]  # Sets random coordinates to polygons
+    x_y_coords = [random.randrange(10, 190) for i in range(n*2)]  # Sets random coordinates to polygons
 
     # 0 <= R|G|B < 256, 30 <= A <= 60, 10 <= x|y < 190
-    return [(R, G, B, A), (x1, y1), (x2, y2), (x3, y3), (x4, y4)]
+    return [(R, G, B, A)] + [(x_y_coords[i], x_y_coords[i+1]) for i in range(0, len(x_y_coords), 2)]
 
 
 def initialise():
@@ -125,16 +124,16 @@ def evolve(population, generation, max_generations, *args):
         Population: The evolved population
     """
     # Start, end rates and rate give the option to change to simulated annealing approach if needed
-    '''
+
     start_rate = 0.9  # The initial mutation rate
-    end_rate = 0.3  # The final mutation rate
+    end_rate = 0.1  # The final mutation rate
     # Calculate the mutation rate for the current generation
     rate = start_rate * (1 - (generation / max_generations)) + end_rate * (generation / max_generations)
-    '''
+
     population.survive(fraction=0.1)
     population.breed(parent_picker=select, combiner=combine)
     # uncomment code above and type rate=rate to use simulated annealing
-    population.mutate(mutate_function=mutate, rate=sine_func(generation))
+    population.mutate(mutate_function=mutate, rate=rate)
     return population
 
 
