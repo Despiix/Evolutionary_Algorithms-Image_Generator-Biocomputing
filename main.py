@@ -22,10 +22,10 @@ def make_polygon(n):
     """
     R, G, B = [random.randrange(256) for i in range(3)]  # Assigns random int values to Red, Green and Blue
     A = random.randrange(30, 60)  # Sets random opaqueness
-    x_y_coords = [random.randrange(10, 190) for i in range(n*2)]  # Sets random coordinates to polygons
+    x_y_coords = [random.randrange(10, 190) for i in range(n * 2)]  # Sets random coordinates to polygons
 
     # 0 <= R|G|B < 256, 30 <= A <= 60, 10 <= x|y < 190
-    return [(R, G, B, A)] + [(x_y_coords[i], x_y_coords[i+1]) for i in range(0, len(x_y_coords), 2)]
+    return [(R, G, B, A)] + [(x_y_coords[i], x_y_coords[i + 1]) for i in range(0, len(x_y_coords), 2)]
 
 
 def initialise():
@@ -108,8 +108,9 @@ def combine(*parents):
     return [a if random.random() < 0.5 else b for a, b in zip(*parents)]
 
 
-def sine_func(x, gens_per_cycle=200, decay=0.0001, min_=0.1):
-    return np.maximum(np.sin(x * (2 * np.pi) / gens_per_cycle) ** 2 * np.exp(-x * decay), min_)
+# Sine wave mutation to allow for both, exploration and exploitation
+def sine_func(gen, gens_per_cycle=200, decay=0.0001, min_=0.1):
+    return np.maximum(np.sin(gen * (2 * np.pi) / gens_per_cycle) ** 2 * np.exp(-gen * decay), min_)
 
 
 # generation, max_generations are there for the use of dynamic mutation rates
@@ -126,7 +127,7 @@ def evolve(population, generation, max_generations, *args):
     # Start, end rates and rate give the option to change to simulated annealing approach if needed
 
     start_rate = 0.9  # The initial mutation rate
-    end_rate = 0.1  # The final mutation rate
+    end_rate = 0.05  # The final mutation rate
     # Calculate the mutation rate for the current generation
     rate = start_rate * (1 - (generation / max_generations)) + end_rate * (generation / max_generations)
 
