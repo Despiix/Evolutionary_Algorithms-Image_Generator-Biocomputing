@@ -5,6 +5,7 @@ from evol import Population
 from PIL import Image, ImageDraw
 
 SIDES = 7
+SIDES2 = 2
 POLYGON_COUNT = 100
 # Constants for image
 MAX = 255 * 200 * 200
@@ -28,9 +29,26 @@ def make_polygon(n):
     return [(R, G, B, A)] + [(x_y_coords[i], x_y_coords[i + 1]) for i in range(0, len(x_y_coords), 2)]
 
 
+# experimenting with mixed shape types
+def initialise():
+    """
+    Assigns the sides of the polygon and creates as many polygons as stated in the constants above,
+    with 70% of the polygons having 'SIDES' sides and 30% having 'SIDES2' sides.
+    """
+    polygon_count_sides = int(POLYGON_COUNT * 0.7)  # Percentage of polygons with 'SIDES' sides
+    polygon_count_sides2 = POLYGON_COUNT - polygon_count_sides  # Ensures the total counts up to POLYGON_COUNT
+
+    polygons = [make_polygon(SIDES) for _ in range(polygon_count_sides)]
+    polygons += [make_polygon(SIDES2) for _ in range(polygon_count_sides2)]
+    return polygons
+
+
+# Initialise function when needing to use 1 shape type instead of two
+'''
 def initialise():
     """Assigns the sides of the polygon and creates as many polygons as stated in the constants above"""
     return [make_polygon(SIDES) for i in range(POLYGON_COUNT)]
+'''
 
 
 def draw(solution):
