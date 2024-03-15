@@ -4,8 +4,8 @@ import numpy as np
 from evol import Population
 from PIL import Image, ImageDraw
 
-SIDES = 7
-SIDES2 = 2
+SIDES = 3
+SIDES2 = 4
 POLYGON_COUNT = 100
 # Constants for image
 MAX = 255 * 200 * 200
@@ -35,7 +35,7 @@ def initialise():
     Assigns the sides of the polygon and creates as many polygons as stated in the constants above,
     with 70% of the polygons having 'SIDES' sides and 30% having 'SIDES2' sides.
     """
-    polygon_count_sides = int(POLYGON_COUNT * 0.7)  # Percentage of polygons with 'SIDES' sides
+    polygon_count_sides = int(POLYGON_COUNT * 0.5)  # Percentage of polygons with 'SIDES' sides
     polygon_count_sides2 = POLYGON_COUNT - polygon_count_sides  # Ensures the total counts up to POLYGON_COUNT
 
     polygons = [make_polygon(SIDES) for _ in range(polygon_count_sides)]
@@ -98,7 +98,7 @@ def mutate(solution, rate):
     return solution
 
 
-def tournament_select(population, tournament_size=3):
+def tournament_select(population, tournament_size=4):
     """
     Selects an individual via tournament selection.
     Parameters:
@@ -145,11 +145,11 @@ def evolve(population, generation, max_generations, *args):
     # Start, end rates and rate give the option to change to simulated annealing approach if needed
 
     start_rate = 0.9  # The initial mutation rate
-    end_rate = 0.05  # The final mutation rate
+    end_rate = 0.005  # The final mutation rate
     # Calculate the mutation rate for the current generation
     rate = start_rate * (1 - (generation / max_generations)) + end_rate * (generation / max_generations)
 
-    population.survive(fraction=0.1)
+    population.survive(fraction=0.3)
     population.breed(parent_picker=select, combiner=combine)
     # uncomment code above and type rate=rate to use simulated annealing
     population.mutate(mutate_function=mutate, rate=rate)
