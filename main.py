@@ -152,7 +152,7 @@ def combine(*parents):
 
 
 # Sine wave mutation to allow for both, exploration and exploitation
-def sine_func(gen, gens_per_cycle=200, decay=0.00001, min_=0.01):
+def sine_func(gen, gens_per_cycle=200, decay=0.00001, min_=0.1):
     return np.maximum(np.sin(gen * (2 * np.pi) / gens_per_cycle) ** 2 * np.exp(-gen * decay), min_)
 
 
@@ -170,7 +170,7 @@ def evolve(population, generation, max_generations, *args):
     # Start, end rates and rate give the option to change to simulated annealing approach if needed
 
     start_rate = 0.9  # The initial mutation rate
-    end_rate = 0.05  # The final mutation rate
+    end_rate = 0.1  # The final mutation rate
     # Calculate the mutation rate for the current generation
     rate = start_rate * (1 - (generation / max_generations)) + end_rate * (generation / max_generations)
 
