@@ -152,7 +152,7 @@ def combine(*parents):
 
 
 # Sine wave mutation to allow for both, exploration and exploitation
-def sine_func(gen, gens_per_cycle=200, decay=0.00001, min_=0.01):
+def sine_func(gen, gens_per_cycle=200, decay=0.00001, min_=0.1):
     return np.maximum(np.sin(gen * (2 * np.pi) / gens_per_cycle) ** 2 * np.exp(-gen * decay), min_)
 
 
@@ -177,7 +177,7 @@ def evolve(population, generation, max_generations, *args):
     population.survive(fraction=0.1)
     population.breed(parent_picker=select, combiner=combine)
     # uncomment code above and type rate=rate to use simulated annealing
-    population.mutate(mutate_function=mutate, rate=sine_func(generation))
+    population.mutate(mutate_function=mutate, rate=rate)
     population.mutate(mutate_function=mutate_color, rate=sine_func(generation))
     return population
 
